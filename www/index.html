@@ -1,0 +1,146 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Connect Four</title> 
+        <link rel="stylesheet" href="../../assets/main.css">
+        <link rel="stylesheet" href="css/mainstyles.css" type="text/css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+        <script type="text/javascript" src="js/lib/jquery-1.8.2.js"></script>
+  		<script type="text/javascript" src="js/lib/jquery-ui-1.9.0.custom.min.js"></script>
+  		<script type="text/javascript" src="js/game.js"></script>
+  		<script type="text/javascript" src="js/gameView.js"></script>
+        <script type="text/javascript" src="js/config.js"></script>
+        <script type="text/javascript" src="js/squares.js"></script>
+        <script type="text/javascript" src="js/Board.js"></script>
+        <script type="text/javascript" src="js/boardView.js"></script>
+        <script type="text/javascript" src="js/State.js"></script>
+        <script type="text/javascript" src="js/AI.js"></script>
+        <script type="text/javascript" src="js/startScreen.js"></script>
+        <script type="text/javascript" src="js/startScreenView.js"></script>
+        <script>
+        
+$(document).ready(function() {
+	gameView.renderBoard();
+	gameView.addOpacity();
+	startScreenView.buildStartScreen();
+	startScreenView.showStartScreen();
+	startScreen.bindClicks(1);
+});
+
+$(document).on("playerMakesMove",function(e,col){
+	game.deActivateArrows();
+	var emptyRow = squares.findEmptyRow(col,game.state.board);
+	var coords = {col:col,row:emptyRow};
+	var state = new State(game.state, game.ai.level);
+	state.board = squares.addPiece(coords,state.playerTurn,state.board);
+	state.numOfMoves++;
+	game.updateState(state);
+	gameView.renderPiece(coords, game.state.playerTurn, game.state);
+	game.state.changeTurn();
+	if (emptyRow === 0) {
+		game.disableColumn(col);
+	}
+});
+
+$(document).on("pieceDropped", function(e, col, state){
+	//$(document).trigger("checkForWin");
+	if (state.isTerminal()) {
+		game.state.status = "ended";
+		if (game.state.result === "draw") {
+			$(document).trigger("winningSquaresShown");
+			$("#winnerBox").addClass("draw");
+		} else {
+			var winningSquares = game.getWinningSquares(game.state);
+			game.showWinningSquares(winningSquares);
+		}
+	} else {
+		if (game.players === "one" && state.playerTurn === "pTwo") {
+			$(document).trigger("computerPlayerMove");
+		} 
+	} 
+
+});
+
+$(document).on("winningSquaresShown", function() {
+	game.updateWinnerBox(game.state.result);
+	game.deactivateContBtns();
+	game.activateContBtns();
+	gameView.showWinnerBox();
+	game.disableAllColumns();
+});
+
+$(document).on("checkForWin", function() {
+	var winner;
+	if (winner = game.checkForWin(game.board)) {
+		console.log("Winner!");
+		game.disableAllColumns();
+		gameView.showWinner(winner);
+		
+	} 
+});
+
+$(document).on("computerPlayerMove", function() {
+	console.log("computermove");
+	if (game.ai.level === 0) {
+		console.log("random move");
+		$(document).trigger("computerMoveRandom");
+	} else {
+		$(document).trigger("computerMove");
+	}
+});
+
+$(document).on("computerMoveRandom", function() {
+	var columns = game.cols;
+	var col = Math.floor(Math.random()*columns);
+	
+	while ($.inArray(col, game.state.disabledColumns) > -1 ) {
+		col = Math.floor(Math.random()*columns);
+	}
+	//$(document).trigger("dropPiece", col);
+	//var chosenAction = availableMoves[0];
+    //var nextState = chosenAction.applyMoveTo(game.state);
+	gameView.renderPiece(chosenAction.movePos, turn, nextState)
+
+    // take the game to the next state
+    game.updateState(nextState);
+});
+
+$(document).on("computerMove", function() {
+	AI.chooseMove(game.state.playerTurn,game.state,game.ai.level);
+});
+
+</script>
+
+</head> 
+    <body>
+<div id="header-place"></div>
+    	<script>
+$(function(){
+  $("#header-place").load("/assets/nav.html");
+});
+</script>
+    	<div id="mainWindow">
+			<p class="description">This is a JavaScript version of the popular game Connect Four that utilizes an AI based upon the MiniMax algorithm. As the levels increase, the AI is able to look more and more moves ahead.</p>
+			<div id="game_wrapper">
+				<div id="start_screen" class="popUpBox">
+					<div class="start">
+						<p class="level"></p>
+						<button id="startGame">GO!</button>
+					</div>
+				</div>
+				<div id="winnerBox" class="popUpBox">
+					<div class="winner">
+						<p class="pName"></p>
+						<button></button>
+					</div>
+				</div>
+				<div id="board">
+				<div id="arrows"></div>
+					
+				</div>
+    		</div>
+    	</div>
+    </body> 
+</html> 

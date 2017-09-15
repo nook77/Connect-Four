@@ -1,0 +1,28 @@
+#mapWindow {
+    position: relative;
+}
+
+#mainBox {
+    background: #ffffff none repeat scroll 0 0;
+    border: 2px solid black;
+    position: fixed;
+    z-index: 101;
+    top: 30px;
+    left: 30px;
+    padding: 5px;
+}
+
+.button {
+    display: table-cell;
+    padding-right: 10px;
+}
+
+#mapImage {
+    position: absolute;
+    width: 200%;
+}
+
+#mapImage img {
+    width: 100%;
+    height: 100%;
+}

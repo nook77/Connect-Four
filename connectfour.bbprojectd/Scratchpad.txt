@@ -1,0 +1,16 @@
+create game tree
+
+game.tree = new Object();
+
+for (i = 0; i<computerLevel; i++) {
+	game.tree[i] = new Array();
+	for (j=0; j<game.cols; j++) {
+		game.tree[i] = add piece in col j to dummy board
+	
+	
+	
+	}
+}
+
+
+
